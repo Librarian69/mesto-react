@@ -6,13 +6,12 @@ import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
 import '../index.css'
 
-function App() {
-  
+function App() {  
 
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
-  const [selectedCard, setSelectedCard] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({name: '', link: ''});
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -34,12 +33,11 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
-    setSelectedCard(false);
+    setSelectedCard({name: '', link: ''});
   }
   
   return (
-    <>
-      
+    <>      
     <Header />
     <Main 
       onEditProfile={handleEditProfileClick}
@@ -48,7 +46,13 @@ function App() {
       onCardClick={handleCardClick}
     />
     
-    <PopupWithForm title="Редактировать профиль" name="editProfileForm" isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} >
+    <PopupWithForm 
+      title="Редактировать профиль" 
+      name="editProfileForm" 
+      isOpen={isEditProfilePopupOpen} 
+      onClose={closeAllPopups} 
+      buttonText="Сохранить"
+    >
       <input
         className="popup__input popup__input_type_name"
         type="text"
@@ -73,7 +77,13 @@ function App() {
       <span className="popup__input-error input-aboutUser-error"></span>
     </PopupWithForm>
 
-    <PopupWithForm title="Новое место" name="addPhotoForm" isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
+    <PopupWithForm 
+      title="Новое место" 
+      name="addPhotoForm" 
+      isOpen={isAddPlacePopupOpen} 
+      onClose={closeAllPopups}
+      buttonText="Сохранить"
+    >
       <input
         className="popup__input popup__input_type_appellation"
         type="text"
@@ -96,9 +106,18 @@ function App() {
       <span className="popup__input-error input-linkForm-error"></span>
     </PopupWithForm>  
     
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+    <ImagePopup 
+      card={selectedCard} 
+      onClose={closeAllPopups} 
+    />
 
-    <PopupWithForm title="Обновить аватар" name="editAvatar" isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups}>
+    <PopupWithForm 
+      title="Обновить аватар" 
+      name="editAvatar" 
+      isOpen={isEditAvatarPopupOpen} 
+      onClose={closeAllPopups}
+      buttonText="Сохранить"
+    >
       <input
         className="popup__input popup__input_type_avatar"
         type="url"
@@ -108,9 +127,12 @@ function App() {
         required
       />
       <span className="popup__input-error input-linkMainFoto-error"></span>
-      </PopupWithForm>
+    </PopupWithForm>
 
-      <PopupWithForm title="Вы уверены?" name="delete">
+      <PopupWithForm 
+        title="Вы уверены?"
+         name="delete"
+      >
         <button className="popup__button-save" type="submit">Да</button>
       </PopupWithForm>  
 
