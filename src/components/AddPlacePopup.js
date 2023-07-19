@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PopupWithForm from "./PopupWithForm";
 
 export default function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setName("");
+      setLink("");
+    }
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -47,6 +54,5 @@ export default function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       />
       <span className="popup__input-error input-linkForm-error"></span>
     </PopupWithForm>  
-  
   );
 }

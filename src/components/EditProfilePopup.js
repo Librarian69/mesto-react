@@ -8,9 +8,11 @@ export default function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
   const { currentUser } = useContext(CurrentUserContext);
 
   useEffect(() => {
-    setName(currentUser?.name);
-    setDescription(currentUser?.about);
-  }, [currentUser]);
+    if (isOpen) {
+      setName(currentUser?.name || "");
+      setDescription(currentUser?.about || "");
+    }
+  }, [isOpen, currentUser]);
 
   function handleSubmit(e) {
     // Запрещаем браузеру переходить по адресу формы

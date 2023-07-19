@@ -47,7 +47,7 @@ function Main({
         <ul className="cards-grid__list">
           {cards.map((card, _id) => (
             <Card
-              key={_id}
+              key={card._id}
               card={card}
               onCardClick={onCardClick}
               onCardLike={onCardLike}

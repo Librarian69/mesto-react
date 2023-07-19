@@ -1,8 +1,14 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import PopupWithForm from "./PopupWithForm";
 
 export default function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
   const link = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      link.current.value = "";
+    }
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -28,11 +34,9 @@ export default function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
         placeholder="Ссылка на картинку"
         id="input-linkMainFoto"
         ref={link}
-        onChange={(e) => (link.current.value = e.target.value)}
         required
       />
       <span className="popup__input-error input-linkMainFoto-error"></span>
     </PopupWithForm>
-   
-  );
+  ); 
 }
