@@ -1,4 +1,4 @@
-export default class Api {
+class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
     this._headers = options.headers;
@@ -6,7 +6,7 @@ export default class Api {
 
   _handleResponse(response) {
     if (response.ok) {
-      return response.json(); 
+      return response.json();
     }
     return Promise.reject(`Произошла ошибка: ${response.status}`);
   }
@@ -33,8 +33,8 @@ export default class Api {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        name: data.userName,
-        about: data.aboutUser,
+        name: data.name,
+        about: data.about,
       }),
     });
   }
@@ -44,8 +44,8 @@ export default class Api {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify({
-        name: data.titleForm,
-        link: data.linkForm,
+        name: data.name,
+        link: data.link,
       }),
     });
   }
@@ -76,8 +76,31 @@ export default class Api {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
-        avatar: data.linkForm,
+        avatar: data.avatar,
       }),
     });
   }
+
+  changeLikeCardStatus(id, isLiked) {
+    if (isLiked) {
+      return this._request(`${this._baseUrl}/cards/${id}/likes`, {
+        method: "PUT",
+        headers: this._headers,
+      });
+    } else {
+      return this._request(`${this._baseUrl}/cards/${id}/likes`, {
+        method: "DELETE",
+        headers: this._headers,
+      });
+    }
+  }
 }
+
+const api = new Api({
+  baseUrl: "https://mesto.nomoreparties.co/v1/cohort-68",
+  headers: {
+    Authorization: "03c31aba-d3c5-4738-8c0c-1ec3028f3f5d",
+    "Content-Type": "application/json",
+  },
+});
+export default api;

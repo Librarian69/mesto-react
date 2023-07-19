@@ -1,29 +1,41 @@
-import Api from '../utils/Api';
+import { useContext } from "react";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 
-const api = new Api({ 
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-68', 
-  headers: {
-    Authorization: "03c31aba-d3c5-4738-8c0c-1ec3028f3f5d",
-    "Content-Type": "application/json",
-  },
-});
+function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+  const { currentUser } = useContext(CurrentUserContext);
 
-function Card({ card, onCardClick }) {
-  const handleCardClick = () => {
-    onCardClick(card);
-  };
+  const isOwn = card.owner._id === currentUser._id;
+  const isLiked = card.likes.some((i) => i._id === currentUser._id);
+  const cardLikeBtnClassName = `card__button-like ${
+    isLiked ? "card__button-like_active" : ""
+  }`;
 
   return (
     <li className="card">
-      <img className="card__photo" src={card.link} alt={card.name} onClick={handleCardClick} />
+      <img
+        className="card__photo"
+        src={card.link}
+        alt={card.name}
+        onClick={() => onCardClick(card)}
+      />
       <div className="card__container">
         <h2 className="card__title">{card.name}</h2>
         <div className="card__likes-container">
-          <button className="card__button-like" type="button"></button>
+          <button
+            className={cardLikeBtnClassName}
+            type="button"
+            onClick={() => onCardLike(card)}
+          ></button>
           <span className="card__likes-counter">{card.likes.length}</span>
         </div>
       </div>
-      <button className="card__button-delete" type="button"></button>
+      {isOwn && (
+        <button
+          className="card__button-delete"
+          type="button"
+          onClick={() => onCardDelete(card)}
+        ></button>
+      )}
     </li>
   );
 }
