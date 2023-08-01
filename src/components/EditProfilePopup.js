@@ -15,10 +15,8 @@ export default function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
   }, [isOpen, currentUser]);
 
   function handleSubmit(e) {
-    // Запрещаем браузеру переходить по адресу формы
     e.preventDefault();
     console.log(currentUser);
-    // Передаём значения управляемых компонентов во внешний обработчик
     onUpdateUser({
       name,
       about: description,

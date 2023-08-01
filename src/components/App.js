@@ -4,6 +4,7 @@ import Main from "./Main";
 import Footer from "./Footer";
 import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
+
 import "../index.css";
 
 import AddPlacePopup from "./AddPlacePopup";
@@ -11,6 +12,12 @@ import api from "../utils/Api";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import Register from "./Register";
+import Login from "./Login";
+import ProtectedRoute from "./ProtectedRoute";
+import auth from "../utils/Auth";
+import InfoTooltip from "./InfoTooltip";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -20,8 +27,16 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [cards, setCards] = useState([]);
 
+  const [isAuth, setIsAuth] = useState(false);  //Управление доступностью страницы
+  const navigate = useNavigate();
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+  const [err, setErr] = useState(false);
+  const [email, setEmail] = useState("");
+  // const [group, setGroup] = useState(false);
+
   useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getAllCards()])
+    if(isAuth) {
+      Promise.all([api.getUserInfo(), api.getAllCards()])
       .then(([user, cards]) => {
         setCurrentUser(user);
         setCards(cards);
@@ -29,7 +44,23 @@ function App() {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+    }   
+  }, [isAuth, email]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(token) {
+      auth.checkToken(token).then((res) => {
+        setCurrentUser(res)
+        setIsAuth(true)
+        setEmail(res.data.email)
+        navigate("/")
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }
+  }, [])
 
   const handleEditProfileClick = () => {
     setIsEditProfilePopupOpen(true);
@@ -52,7 +83,10 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
+    setIsInfoTooltipOpen(false)
+    // setGroup(false)
   };
+  
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -113,10 +147,56 @@ function App() {
       });
   }
 
+  function handleLogin(obj) {
+    if(!obj.email || !obj.password) {
+      return
+    }
+
+    auth.login(obj).then((data) => {
+      if(data.token) {
+        setIsAuth(true);
+        localStorage.setItem("token", data.token);
+        setEmail(obj.email);
+        navigate("/");
+        }
+      })
+      .catch((err) => {
+        setErr(true)
+        setIsInfoTooltipOpen((prev) => !prev)
+      });
+  }
+
+  function handleRegister(obj) {
+    if(!obj.email || !obj.password) {
+      return
+    }
+
+    auth.register(obj).then((data) => {
+      setErr(false)
+      setIsInfoTooltipOpen((prev) => !prev)
+      navigate("/sign-in");
+
+      })
+      .catch((err) => {
+        setErr(true)
+        setIsInfoTooltipOpen((prev) => !prev)
+      });
+  }  
+
+  function handleExit() {
+    setEmail("")
+    localStorage.removeItem("token")
+
+  }
+  
+
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
-      <Header />
-      <Main
+      <Header email={email} onExit={handleExit}  />
+      <Routes>      
+      <Route path="/" element={
+        <ProtectedRoute isAuth={isAuth}>
+        <Main
         onEditProfile={handleEditProfileClick}
         onAddPlace={handleAddPlaceClick}
         onEditAvatar={handleEditAvatarClick}
@@ -125,7 +205,20 @@ function App() {
         onCardDelete={handleCardDelete}
         cards={cards}
       />
-      <Footer />
+      </ProtectedRoute>
+      } />
+      <Route path="/sign-up" element={<Register onRegister={handleRegister}/>} />
+      <Route path="/sign-in" element={<Login onLogin={handleLogin}/>} />      
+      </Routes>
+
+      <InfoTooltip 
+        name="infoTooltip"
+        onClose={closeAllPopups}
+        isOpen={isInfoTooltipOpen}
+        err={err}
+      />
+
+      <Footer />      
 
       <EditProfilePopup
         isOpen={isEditProfilePopupOpen}
